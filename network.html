@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Réseaux — Exam Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #181824;
+    --border: #2a2a3a;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --accent3: #7c3aed;
+    --text: #e8e8f0;
+    --muted: #888899;
+    --green: #00ff9f;
+    --yellow: #ffd166;
+    --mono: 'Space Mono', monospace;
+    --display: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* Header */
+  header {
+    position: relative;
+    padding: 80px 40px 60px;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(0,229,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 3px 10px;
+    margin-bottom: 20px;
+    animation: fadeDown 0.5s ease forwards;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    animation: fadeDown 0.6s ease 0.1s both;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 13px;
+    animation: fadeDown 0.6s ease 0.2s both;
+  }
+
+  /* Nav */
+  nav {
+    display: flex;
+    gap: 4px;
+    padding: 16px 40px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,15,0.95);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+  }
+
+  nav a {
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  nav a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* Main layout */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 40px;
+  }
+
+  /* Sections */
+  section {
+    margin-bottom: 80px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    background: var(--surface);
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  /* Cards grid */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .card {
+    background: var(--surface);
+    padding: 28px;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--accent);
+    transition: height 0.3s ease;
+  }
+
+  .card:hover { background: var(--surface2); }
+  .card:hover::before { height: 100%; }
+
+  .card.accent2::before { background: var(--accent2); }
+  .card.accent3::before { background: var(--accent3); }
+  .card.green::before { background: var(--green); }
+  .card.yellow::before { background: var(--yellow); }
+
+  .card p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  /* Formula blocks */
+  .formula-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin: 16px 0;
+    overflow: hidden;
+  }
+
+  .formula-label {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 16px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .formula {
+    padding: 16px 20px;
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--yellow);
+    letter-spacing: 0.03em;
+  }
+
+  .formula .comment {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 6px;
+    display: block;
+  }
+
+  /* Formula table */
+  .formula-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 13px;
+  }
+
+  .formula-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: var(--surface2);
+    border-bottom: 2px solid var(--accent);
+    font-family: var(--display);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .formula-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .formula-table tr:hover td { background: var(--surface2); }
+
+  .formula-table td:first-child {
+    font-family: var(--mono);
+    color: var(--yellow);
+    white-space: nowrap;
+  }
+
+  .formula-table td:last-child { color: var(--muted); }
+
+  /* Code-style bits */
+  code {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--green);
+  }
+
+  /* Example boxes */
+  .example {
+    background: rgba(0,255,159,0.04);
+    border: 1px solid rgba(0,255,159,0.2);
+    border-left: 3px solid var(--green);
+    padding: 20px 24px;
+    margin: 20px 0;
+  }
+
+  .example-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 10px;
+  }
+
+  .example p { color: var(--muted); font-size: 13px; }
+  .example strong { color: var(--text); }
+
+  /* Warning/note boxes */
+  .note {
+    background: rgba(255,107,53,0.05);
+    border: 1px solid rgba(255,107,53,0.25);
+    border-left: 3px solid var(--accent2);
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .note strong { color: var(--accent2); }
+
+  /* Encoding visual */
+  .encoding-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+
+  .enc-label {
+    width: 160px;
+    color: var(--muted);
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+
+  .enc-bits {
+    display: flex;
+    gap: 0;
+  }
+
+  .bit {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    border-right: none;
+  }
+
+  .bit:last-child { border-right: 1px solid var(--border); }
+  .bit.one { background: rgba(0,229,255,0.12); color: var(--accent); }
+  .bit.zero { background: var(--surface); color: var(--muted); }
+  .bit.parity { background: rgba(124,58,237,0.2); color: #a78bfa; border-color: rgba(124,58,237,0.4); }
+  .bit.data { background: rgba(255,209,102,0.1); color: var(--yellow); }
+  .bit.error { background: rgba(255,107,53,0.2); color: var(--accent2); border-color: rgba(255,107,53,0.4); }
+
+  /* Hamming position row */
+  .hamming-grid {
+    overflow-x: auto;
+    margin: 16px 0;
+  }
+
+  .hamming-table {
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 13px;
+    min-width: 100%;
+  }
+
+  .hamming-table th, .hamming-table td {
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-align: center;
+  }
+
+  .hamming-table th {
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+
+  .hamming-table td.p { color: #a78bfa; background: rgba(124,58,237,0.1); }
+  .hamming-table td.d { color: var(--yellow); }
+
+  /* Steps */
+  .steps { margin: 16px 0; }
+
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--accent);
+    color: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--mono);
+  }
+
+  .step-content { color: var(--muted); font-size: 13px; }
+  .step-content strong { color: var(--text); }
+
+  /* Big formula reference */
+  .ref-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 20px;
+  }
+
+  .ref-item {
+    background: var(--surface);
+    padding: 20px;
+  }
+
+  .ref-formula {
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--yellow);
+    margin-bottom: 6px;
+  }
+
+  .ref-desc {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  .highlight { color: var(--accent); }
+  .highlight2 { color: var(--accent2); }
+  .highlight3 { color: var(--green); }
+
+  @media (max-width: 600px) {
+    header, main { padding: 40px 20px; }
+    nav { padding: 12px 20px; }
+    .enc-label { width: 120px; }
+    .bit { width: 28px; height: 28px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">Module: Réseaux · 2ème Année LMD</div>
+  <h1>Networks<br><span>Exam Guide</span></h1>
+  <p class="subtitle">TD1 · TD2 · TD3 — All concepts, formulas & examples</p>
+</header>
+
+<nav>
+  <a href="#td1">TD1: Physical</a>
+  <a href="#bandwidth">Bandwidth</a>
+  <a href="#nyquist">Nyquist</a>
+  <a href="#shannon">Shannon</a>
+  <a href="#delay">Delay</a>
+  <a href="#td2">TD2: Coding</a>
+  <a href="#encoding">Line Encoding</a>
+  <a href="#crc">CRC</a>
+  <a href="#td3">TD3: Hamming</a>
+  <a href="#ref">Formula Ref</a>
+</nav>
+
+<main>
+
+  <!-- ======= TD1 ======= -->
+  <section id="td1">
+    <div class="section-header">
+      <span class="section-num">TD — 01</span>
+      <h2>Physical Transmission</h2>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Bandwidth <span class="highlight">B</span></h3>
+        <p>A medium acts as a filter — only frequencies in [Fmin, Fmax] pass through. Everything outside is heavily attenuated.</p>
+        <div class="formula-block" style="margin-top:14px">
+          <div class="formula">B = Fmax − Fmin</div>
+        </div>
+        <p style="margin-top:10px">Phone line: 300–3400 Hz → B = <strong>3100 Hz</strong><br>
+        Coaxial cable: B ≈ <strong>300–400 MHz</strong></p>
+      </div>
+
+      <div class="card accent2">
+        <h3>Modulation Rate <span class="highlight2">R</span></h3>
+        <p>Number of <strong>symbols</strong> transmitted per second (in Bauds). One symbol can carry multiple bits.</p>
+        <div class="formula-block" style="margin-top:14px">
+          <div class="formula">R = 1 / T</div>
+        </div>
+        <p style="margin-top:10px">T = duration of one symbol (seconds)<br>
+        Max rate: <strong>Rmax = 2 × Fmax</strong></p>
+      </div>
+
+      <div class="card accent3">
+        <h3>Valence <span style="color:#a78bfa">V</span></h3>
+        <p>Number of <strong>distinct states</strong> a signal can take. Binary signal: V=2. Quadrivalent: V=4. More states = more bits per symbol.</p>
+        <div class="formula-block" style="margin-top:14px">
+          <div class="formula">log₂(V) = bits per symbol</div>
+        </div>
+        <p style="margin-top:10px">V=2 → 1 bit/symbol<br>V=4 → 2 bits/symbol<br>V=16 → 4 bits/symbol</p>
+      </div>
+
+      <div class="card green">
+        <h3>Bit Rate <span class="highlight3">D</span></h3>
+        <p>Number of <strong>bits</strong> transmitted per second. Connects modulation rate to actual data throughput.</p>
+        <div class="formula-block" style="margin-top:14px">
+          <div class="formula">D = R × log₂(V)</div>
+        </div>
+        <p style="margin-top:10px">If V=2: D = R (same as baud rate)<br>If V=4: D = R × 2</p>
+      </div>
+
+      <div class="card yellow">
+        <h3>Attenuation</h3>
+        <p>Signal loses energy over distance. Measured as the ratio of output power to input power, expressed in decibels.</p>
+        <div class="formula-block" style="margin-top:14px">
+          <div class="formula" style="color: var(--yellow)">A(dB) = 10 × log₁₀(S/N)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Error Rate</h3>
+        <p>Probability that a bit is lost or corrupted during transmission. Measured as the ratio of erroneous bits to total bits sent over a significant time period.</p>
+        <div class="formula-block" style="margin-top:14px">
+          <div class="formula">τ = nb_bits_erronés / nb_bits_émis</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nyquist -->
+  <section id="nyquist">
+    <div class="section-header">
+      <span class="section-num">1.1</span>
+      <h2>Nyquist Theorem</h2>
+    </div>
+    <p style="color:var(--muted); margin-bottom:20px">For a <strong style="color:var(--text)">noiseless</strong> channel. Gives the theoretical maximum bit rate based on bandwidth and signal valence.</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Nyquist — Noiseless Channel</div>
+      <div class="formula">
+        Dmax = 2 × F × log₂(V)
+        <span class="comment">F = bandwidth (Hz) · V = valence · Dmax in bits/s</span>
+      </div>
+    </div>
+
+    <div class="example">
+      <div class="example-label">▶ Example — Exercise 1</div>
+      <p>D = 2400 bit/s, V = 2 (bivalent) → R = D / log₂(2) = 2400 / 1 = <strong>2400 bauds</strong></p>
+      <p style="margin-top:8px">Same D, V = 4 (quadrivalent) → R = 2400 / log₂(4) = 2400 / 2 = <strong>1200 bauds</strong></p>
+    </div>
+
+    <div class="example">
+      <div class="example-label">▶ Example — Exercise 3</div>
+      <p>D = 9600 bit/s, V = 16 (4 bits per symbol) → log₂(16) = 4</p>
+      <p style="margin-top:6px">From Nyquist: F = Dmax / (2 × log₂(V)) = 9600 / (2 × 4) = <strong>1200 Hz</strong></p>
+    </div>
+  </section>
+
+  <!-- Shannon -->
+  <section id="shannon">
+    <div class="section-header">
+      <span class="section-num">1.2</span>
+      <h2>Shannon Theorem</h2>
+    </div>
+    <p style="color:var(--muted); margin-bottom:20px">For a <strong style="color:var(--text)">noisy</strong> channel. Absolute upper bound — no coding scheme can exceed this.</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Shannon — Noisy Channel</div>
+      <div class="formula">
+        C = F × log₂(1 + S/N)
+        <span class="comment">S/N is a power ratio — NOT in dB. Convert first if needed.</span>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>⚠ dB Conversion:</strong> If SNR is given in dB, convert: <strong>S/N = 10^(dB / 10)</strong><br>
+      Example: 20 dB → S/N = 10^(20/10) = 10² = <strong>100</strong>
+    </div>
+
+    <div class="example">
+      <div class="example-label">▶ Example — Exercise 5</div>
+      <p>F = 3000 Hz, SNR = 20 dB → S/N = 100</p>
+      <p style="margin-top:6px">C = 3000 × log₂(1 + 100) = 3000 × log₂(101)</p>
+      <p style="margin-top:6px">log₂(101) ≈ 6.658 → C ≈ 3000 × 6.658 = <strong>≈ 19,974 bit/s</strong></p>
+    </div>
+
+    <div class="example">
+      <div class="example-label">▶ Example — Exercise 4</div>
+      <p>Cat5 twisted pair: F = 100 MHz, S/N = 100 (signal is 100× noise)</p>
+      <p style="margin-top:6px">C = 100×10⁶ × log₂(101) ≈ 100×10⁶ × 6.658 ≈ <strong>665.8 Mbit/s</strong></p>
+    </div>
+  </section>
+
+  <!-- Delay -->
+  <section id="delay">
+    <div class="section-header">
+      <span class="section-num">1.3</span>
+      <h2>Transmission vs Propagation Delay</h2>
+    </div>
+
+    <div class="note">
+      <strong>Critical distinction:</strong> These are two completely different things. The exam will mix them — don't.
+    </div>
+
+    <div class="cards" style="margin-top:20px">
+      <div class="card">
+        <h3>Transmission Time <span class="highlight">Tt</span></h3>
+        <p>Time to push <em>all bits</em> of a message onto the wire. Depends on message size and bit rate.</p>
+        <div class="formula-block" style="margin-top:12px">
+          <div class="formula">Tt = Size (bits) / D (bit/s)</div>
+        </div>
+      </div>
+      <div class="card accent2">
+        <h3>Propagation Delay <span class="highlight2">Tp</span></h3>
+        <p>Time for a single bit to travel from one end to the other. Depends on cable length and propagation speed.</p>
+        <div class="formula-block" style="margin-top:12px">
+          <div class="formula">Tp = L / V</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-block" style="margin-top:20px">
+      <div class="formula-label">Total end-to-end delay</div>
+      <div class="formula">T_total = Tt + Tp = (Size / D) + (L / V)</div>
+    </div>
+
+    <div class="example">
+      <div class="example-label">▶ Example — Exercise 6 (Optical fiber)</div>
+      <p>D = 155 Mb/s, L = 3000 km = 3×10⁶ m, V = 2×10⁸ m/s, packet = 512 octets = 4096 bits</p>
+      <p style="margin-top:6px">Tt = 4096 / (155×10⁶) ≈ <strong>26.4 μs</strong></p>
+      <p>Tp = 3×10⁶ / (2×10⁸) = <strong>15 ms</strong></p>
+      <p>Total ≈ <strong>15.026 ms</strong> (propagation dominates)</p>
+    </div>
+
+    <div class="example">
+      <div class="example-label">▶ Same packet, twisted pair (D = 2 Mb/s)</div>
+      <p>Tt = 4096 / (2×10⁶) = <strong>2.048 ms</strong></p>
+      <p>Tp = same = <strong>15 ms</strong></p>
+      <p>Total ≈ <strong>17.05 ms</strong> — transmission time is now significant</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ======= TD2 ======= -->
+  <section id="td2">
+    <div class="section-header">
+      <span class="section-num">TD — 02</span>
+      <h2>Line Coding & Error Detection</h2>
+    </div>
+  </section>
+
+  <section id="encoding">
+    <div class="section-header">
+      <span class="section-num">2.1</span>
+      <h2>Baseband Encoding</h2>
+    </div>
+    <p style="color:var(--muted); margin-bottom: 24px">For sequence: <code>0 1 1 0 1 0 0 0</code></p>
+
+    <!-- NRZ -->
+    <h3 style="margin-bottom:8px">NRZ Bipolar</h3>
+    <p style="color:var(--muted); font-size:13px; margin-bottom:12px">0 → −V &nbsp;|&nbsp; 1 → +V. Simple but no self-clocking.</p>
+    <div class="encoding-row">
+      <span class="enc-label">Bits:</span>
+      <div class="enc-bits">
+        <div class="bit zero">0</div><div class="bit one">1</div><div class="bit one">1</div>
+        <div class="bit zero">0</div><div class="bit one">1</div><div class="bit zero">0</div>
+        <div class="bit zero">0</div><div class="bit zero">0</div>
+      </div>
+    </div>
+    <div class="encoding-row">
+      <span class="enc-label">NRZ Bipolar:</span>
+      <div class="enc-bits">
+        <div class="bit zero">−V</div><div class="bit one">+V</div><div class="bit one">+V</div>
+        <div class="bit zero">−V</div><div class="bit one">+V</div><div class="bit zero">−V</div>
+        <div class="bit zero">−V</div><div class="bit zero">−V</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Manchester -->
+    <h3 style="margin-bottom:8px">Manchester</h3>
+    <p style="color:var(--muted); font-size:13px; margin-bottom:4px">Always a transition at the <strong style="color:var(--text)">middle</strong> of each bit period.</p>
+    <p style="color:var(--muted); font-size:13px; margin-bottom:12px">0 → ↑ (low-to-high at mid) &nbsp;|&nbsp; 1 → ↓ (high-to-low at mid)</p>
+
+    <div class="example">
+      <div class="example-label">Rule</div>
+      <p><strong>Bit 1:</strong> starts HIGH, transitions to LOW at midpoint → ↓</p>
+      <p style="margin-top:4px"><strong>Bit 0:</strong> starts LOW, transitions to HIGH at midpoint → ↑</p>
+      <p style="margin-top:8px">Self-clocking: the mid-bit transition is always present, so the receiver can always find the clock.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Differential Manchester -->
+    <h3 style="margin-bottom:8px">Differential Manchester</h3>
+    <p style="color:var(--muted); font-size:13px; margin-bottom:12px">Mid-bit transition always exists (for clocking). Data encoded by <strong style="color:var(--text)">start-of-bit transition</strong>.</p>
+
+    <div class="cards">
+      <div class="card">
+        <h3 style="color:var(--accent)">Bit 1</h3>
+        <p><strong>No transition</strong> at the start of the bit period. Only the mid-bit transition occurs.</p>
+      </div>
+      <div class="card accent2">
+        <h3 style="color:var(--accent2)">Bit 0</h3>
+        <p><strong>Transition</strong> at the start of the bit period, plus the mid-bit transition.</p>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:20px">
+      <strong>Exam tip:</strong> When decoding from a diagram, identify the mid-point of each cell. In Manchester, look at the direction of the mid-transition (↓=1, ↑=0). In Differential Manchester, look at whether there's a transition at the cell boundary (transition=0, no transition=1).
+    </div>
+
+    <hr class="divider">
+
+    <!-- Miller -->
+    <h3 style="margin-bottom:12px">Miller (Delay Modulation)</h3>
+    <div class="cards">
+      <div class="card">
+        <h3 style="color:var(--accent)">Bit 1</h3>
+        <p>Transition at the <strong>middle</strong> of the bit period.</p>
+      </div>
+      <div class="card accent2">
+        <h3 style="color:var(--accent2)">Bit 0 (isolated)</h3>
+        <p>No transition at middle or start — level stays constant.</p>
+      </div>
+      <div class="card accent3">
+        <h3 style="color:#a78bfa">Bit 0 (after 0)</h3>
+        <p>Transition at the <strong>start</strong> of the bit period (boundary between two zeros).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Parity -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">2.2</span>
+      <h2>Parity Bit</h2>
+    </div>
+
+    <p style="color:var(--muted); margin-bottom:20px"><strong style="color:var(--text)">Odd parity (impaire):</strong> Add a bit so total number of 1s in the word is <strong style="color:var(--text)">odd</strong>.</p>
+
+    <div class="example">
+      <div class="example-label">▶ Exercise 4 — "NET" with odd parity</div>
+      <p><strong>N</strong> = 1001110 → four 1s (even) → parity bit = <strong>1</strong> → transmitted: <code>10011101</code></p>
+      <p style="margin-top:6px"><strong>E</strong> = 1001001 → three 1s (odd) → parity bit = <strong>0</strong> → transmitted: <code>10010010</code></p>
+      <p style="margin-top:6px"><strong>T</strong> = 1010100 → three 1s (odd) → parity bit = <strong>0</strong> → transmitted: <code>10101000</code></p>
+    </div>
+  </section>
+
+  <!-- CRC -->
+  <section id="crc">
+    <div class="section-header">
+      <span class="section-num">2.3</span>
+      <h2>CRC — Cyclic Redundancy Check</h2>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>Identify degree r</strong> of the generator polynomial g(x). That's the highest power of x.
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>Append r zeros</strong> to the original message M → this is M × 2^r.
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>XOR divide</strong> M×2^r by the generator G (binary long division, no borrows — only XOR).
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <strong>Remainder R</strong> (r bits) is the CRC. Transmitted message = M + R (concatenated).
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Verification:</strong> Divide received message by G. If remainder = 0 → no error detected. If ≠ 0 → error.
+    </div>
+
+    <div class="example">
+      <div class="example-label">▶ Exercise 5 — CRC Encoding</div>
+      <p>Message M = <code>0011111101</code>, g(x) = x² + x + 1 → G = <code>111</code>, degree r = 2</p>
+      <p style="margin-top:8px">Append 2 zeros: M' = <code>001111110100</code></p>
+      <p style="margin-top:8px">XOR divide <code>001111110100</code> by <code>111</code>:</p>
+      <p style="margin-top:6px; font-family:var(--mono); color:var(--muted)">
+        0011 ÷ 111 → 011 XOR 111 = 100 ... bring down bits one at a time<br>
+        Continue until remainder has &lt; 3 bits → remainder = <strong style="color:var(--green)">01</strong>
+      </p>
+      <p style="margin-top:8px">Transmitted: <code>001111110101</code> (append remainder <code>01</code>)</p>
+    </div>
+
+    <div class="example">
+      <div class="example-label">▶ Exercise 5 — CRC Verification</div>
+      <p>Received = <code>101011000110</code>, g(x) = x⁶+x⁴+x+1 → G = <code>1010011</code></p>
+      <p style="margin-top:8px">Divide <code>101011000110</code> by <code>1010011</code> using XOR division.</p>
+      <p style="margin-top:6px">If remainder = 0 → transmission correct. The message (without last 6 bits CRC) is the original data.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ======= TD3 ======= -->
+  <section id="td3">
+    <div class="section-header">
+      <span class="section-num">TD — 03</span>
+      <h2>Hamming Code</h2>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Code Parameters</h3>
+        <p><strong style="color:var(--accent)">n</strong> = total bits (data + parity)<br>
+        <strong style="color:var(--yellow)">k</strong> = data bits<br>
+        <strong style="color:#a78bfa">m</strong> = parity bits = n − k<br>
+        <strong style="color:var(--green)">dmin</strong> = 3 (always for standard Hamming)</p>
+      </div>
+      <div class="card accent2">
+        <h3>Key Formula</h3>
+        <p>For m parity bits:</p>
+        <div class="formula-block" style="margin-top:10px">
+          <div class="formula" style="font-size:13px">n = 2ᵐ − 1<br>k = 2ᵐ − 1 − m</div>
+        </div>
+        <p style="margin-top:10px">m=3: n=7, k=4 → code(7,4,3)<br>m=4: n=15, k=11 → code(15,11,4)</p>
+      </div>
+      <div class="card accent3">
+        <h3>Error Capability</h3>
+        <div class="formula-block" style="margin-top:10px">
+          <div class="formula" style="font-size:13px">eD = dmin − 1 = 2<br>eC = ⌊(dmin−1)/2⌋ = 1</div>
+        </div>
+        <p style="margin-top:10px">Standard Hamming: detects up to <strong>2 errors</strong>, corrects <strong>1 error</strong>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-header">
+      <span class="section-num">3.1</span>
+      <h2>Encoding — code(7,4)</h2>
+    </div>
+
+    <p style="color:var(--muted); margin-bottom:20px">Parity bits go at positions that are <strong style="color:var(--text)">powers of 2</strong>. Data bits fill the rest. Positions are numbered right-to-left starting at 1.</p>
+
+    <div class="hamming-grid">
+      <table class="hamming-table">
+        <tr>
+          <th>Position</th>
+          <th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
+        </tr>
+        <tr>
+          <td style="color:var(--muted)">Type</td>
+          <td class="d">D7</td><td class="d">D6</td><td class="d">D5</td>
+          <td class="p">P4</td>
+          <td class="d">D3</td>
+          <td class="p">P2</td><td class="p">P1</td>
+        </tr>
+      </table>
+    </div>
+
+    <p style="color:var(--muted); font-size:13px; margin: 16px 0;">Each parity bit covers positions where the corresponding bit of the position index is 1:</p>
+
+    <div class="cards">
+      <div class="card">
+        <h3 style="color:#a78bfa">P1 (pos 1 = 001₂)</h3>
+        <p>Covers positions: <strong>1, 3, 5, 7</strong><br>
+        <span style="color:var(--muted)">(positions where bit 0 = 1)</span></p>
+        <p style="margin-top:8px">Set P1 so that count of 1s in {P1, D3, D5, D7} is <strong>even</strong></p>
+      </div>
+      <div class="card accent3">
+        <h3 style="color:#a78bfa">P2 (pos 2 = 010₂)</h3>
+        <p>Covers positions: <strong>2, 3, 6, 7</strong><br>
+        <span style="color:var(--muted)">(positions where bit 1 = 1)</span></p>
+        <p style="margin-top:8px">Set P2 so that count of 1s in {P2, D3, D6, D7} is <strong>even</strong></p>
+      </div>
+      <div class="card">
+        <h3 style="color:#a78bfa">P4 (pos 4 = 100₂)</h3>
+        <p>Covers positions: <strong>4, 5, 6, 7</strong><br>
+        <span style="color:var(--muted)">(positions where bit 2 = 1)</span></p>
+        <p style="margin-top:8px">Set P4 so that count of 1s in {P4, D5, D6, D7} is <strong>even</strong></p>
+      </div>
+    </div>
+
+    <div class="example" style="margin-top:24px">
+      <div class="example-label">▶ Exercise 01 — Encode '0001'</div>
+      <p>Data bits: D7=0, D6=0, D5=0, D3=1</p>
+      <p style="margin-top:8px">Place in grid: <code>_ _ 0 _ ? 1 ? ? ?</code> → positions 7,6,5 = 0,0,0 and pos 3 = 1</p>
+      <p style="margin-top:10px"><strong>P1:</strong> covers {1,3,5,7} = {P1, 1, 0, 0} → one 1 → P1 = <strong>1</strong> (to make even)</p>
+      <p><strong>P2:</strong> covers {2,3,6,7} = {P2, 1, 0, 0} → one 1 → P2 = <strong>1</strong></p>
+      <p><strong>P4:</strong> covers {4,5,6,7} = {P4, 0, 0, 0} → zero 1s → P4 = <strong>0</strong></p>
+      <p style="margin-top:12px">Final code: D7 D6 D5 P4 D3 P2 P1 = <strong style="color:var(--green)">0 0 0 0 1 1 1</strong> → <code>0000111</code></p>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-header">
+      <span class="section-num">3.2</span>
+      <h2>Error Detection — Syndrome</h2>
+    </div>
+
+    <p style="color:var(--muted); margin-bottom:20px">Recompute all parity checks on the received word. Each failed check contributes its bit position to the syndrome. The syndrome value = position of the error.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content"><strong>Recompute P1, P2, P4</strong> on the received word using the same coverage rules.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content"><strong>Build syndrome:</strong> if P4 fails → bit 2 = 1. If P2 fails → bit 1 = 1. If P1 fails → bit 0 = 1.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content"><strong>Syndrome value</strong> (in decimal) = position of the erroneous bit. <strong>Flip that bit.</strong></div>
+      </div>
+    </div>
+
+    <div class="example">
+      <div class="example-label">▶ Exercise 02 — Verify '1011100'</div>
+      <p>Positions: P1=0, P2=0, D3=1, P4=1, D5=1, D6=0, D7=1</p>
+      <p style="margin-top:10px"><strong>P1 check</strong> {1,3,5,7}: bits = 0,1,1,1 → three 1s → odd → <strong style="color:var(--accent2)">FAIL (C1=1)</strong></p>
+      <p><strong>P2 check</strong> {2,3,6,7}: bits = 0,1,0,1 → two 1s → even → <strong style="color:var(--green)">OK (C2=0)</strong></p>
+      <p><strong>P4 check</strong> {4,5,6,7}: bits = 1,1,0,1 → three 1s → odd → <strong style="color:var(--accent2)">FAIL (C4=1)</strong></p>
+      <p style="margin-top:12px">Syndrome = C4 C2 C1 = 1 0 1 = <strong>5</strong> → error at position 5 (D5)</p>
+      <p style="margin-top:6px">Received: 1011<strong style="color:var(--accent2)">1</strong>00 → flip pos 5 → corrected: 101<strong style="color:var(--green)">0</strong>100 = <code>1010100</code></p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Formula Reference -->
+  <section id="ref">
+    <div class="section-header">
+      <span class="section-num">REF</span>
+      <h2>Formula Quick Reference</h2>
+    </div>
+
+    <table class="formula-table">
+      <thead>
+        <tr>
+          <th>Formula</th>
+          <th>Name</th>
+          <th>When to use</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>R = 1 / T</td>
+          <td>Modulation Rate</td>
+          <td>From symbol duration T (in seconds)</td>
+        </tr>
+        <tr>
+          <td>D = R × log₂(V)</td>
+          <td>Bit Rate</td>
+          <td>Convert modulation rate to bit rate</td>
+        </tr>
+        <tr>
+          <td>Dmax = 2F × log₂(V)</td>
+          <td>Nyquist</td>
+          <td>Max throughput, <em>noiseless</em> line</td>
+        </tr>
+        <tr>
+          <td>C = F × log₂(1 + S/N)</td>
+          <td>Shannon</td>
+          <td>Max capacity, <em>noisy</em> line</td>
+        </tr>
+        <tr>
+          <td>S/N = 10^(dB/10)</td>
+          <td>dB Conversion</td>
+          <td>Always convert before using Shannon</td>
+        </tr>
+        <tr>
+          <td>Tt = bits / D</td>
+          <td>Transmission Time</td>
+          <td>Time to send a full message</td>
+        </tr>
+        <tr>
+          <td>Tp = L / V</td>
+          <td>Propagation Delay</td>
+          <td>Travel time across a cable</td>
+        </tr>
+        <tr>
+          <td>eD = dmin − 1</td>
+          <td>Detectable Errors</td>
+          <td>Max errors detectable by a code</td>
+        </tr>
+        <tr>
+          <td>eC = ⌊(dmin−1)/2⌋</td>
+          <td>Correctable Errors</td>
+          <td>Max errors correctable (floor division)</td>
+        </tr>
+        <tr>
+          <td>n = 2ᵐ − 1</td>
+          <td>Hamming Size</td>
+          <td>Total bits in a Hamming codeword</td>
+        </tr>
+        <tr>
+          <td>k = 2ᵐ − 1 − m</td>
+          <td>Hamming Data Bits</td>
+          <td>Number of original data bits</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </section>
+
+  <div style="text-align:center; padding: 60px 0 20px; color: var(--muted); font-size:12px; letter-spacing:0.08em;">
+    Université d'El Oued · Module Réseaux · 2ème Année LMD
+  </div>
+
+</main>
+</body>
+</html>
